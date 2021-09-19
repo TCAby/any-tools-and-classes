@@ -14,11 +14,13 @@ class TCALog
     
     private function get_backtrace() {
         // возвращается отформатированный результат функции debug_backtrace
-        $arr_backtrace = debug_backtrace();
-        $backdata = $arr_backtrace[0];
-        $out = 'Called from '.$backdata['file'].' at line '.$backdata['line'].' '.EOL;
-    }
+        $arr_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $backdata = $arr_backtrace[1];
+        $out = 'Called from '.$backdata['file'].' at line '.$backdata['line'].' ';
         
+        return $out;
+    }
+    
     public static function send2console($data){ 
         /*
          * Функция вывода информации в консоль браузера
@@ -53,6 +55,12 @@ class TCALog
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
          */
         date_default_timezone_set('UTC+3');
+        $log_output = '';
+        if(is_array($data) || is_object($data)){
+            $log_output .= 'php_array: '.json_encode($data);
+        } else {
+            $log_output .= 'php_string: '.$data;
+        }        
         file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
     }
 
