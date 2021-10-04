@@ -55,16 +55,16 @@ class TCALog
          * Функция принимает переменный список аргументов (upd 04.10.2021)
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
          */
-        date_default_timezone_set('UTC+3');
+        date_default_timezone_set('Europe/Minsk');
         
         for ($i=0; $i<count($data); $i++) {
             if(is_array($data[$i]) || is_object($data[$i])){
-                $log_output[] = 'php_array: '.json_encode($data[$i]);             
+                $log_output[] = 'php_array: '.json_encode($data[$i]); 
             } else {
                 $log_output[] = 'php_string: '.$data[$i];               
             }
         }        
-        file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
+        file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s e'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
     }
 
     public static function send_get_defined_vars2file() {
@@ -72,7 +72,7 @@ class TCALog
          * Функция вывода информации в файл tcalog.txt
          * Выводит все определенные к моменту вызова в данной области видимости переменные
          */
-        date_default_timezone_set('UTC+3');
+        date_default_timezone_set('Europe/Minsk');
         file_put_contents(self::get_logfilename(), print_r([json_encode(get_defined_vars()), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
     }
     
@@ -81,7 +81,7 @@ class TCALog
          * Функция вывода информации в файл tcalog.txt
          * Выводит стек вызова функции
          */
-        date_default_timezone_set('UTC+3');
+        date_default_timezone_set('Europe/Minsk');
         file_put_contents(self::get_logfilename(), print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
     }
 }
