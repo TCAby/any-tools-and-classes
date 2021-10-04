@@ -49,17 +49,20 @@ class TCALog
         echo("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
     }
 
-    public static function send2file($data) {
+    public static function send2file(...$data) {
         /*
-         * Функция вывода информации в файл tcalog.txt
+         * Функция вывода информации в файл tcalog_<cuttent_date>.txt (например, tcalog_04102021.txt)
+         * Функция принимает переменный список аргументов (upd 04.10.2021)
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
          */
         date_default_timezone_set('UTC+3');
-        $log_output = '';
-        if(is_array($data) || is_object($data)){
-            $log_output .= 'php_array: '.json_encode($data);
-        } else {
-            $log_output .= 'php_string: '.$data;
+        
+        for ($i=0; $i<count($data); $i++) {
+            if(is_array($data[$i]) || is_object($data[$i])){
+                $log_output[] = 'php_array: '.json_encode($data[$i]);             
+            } else {
+                $log_output[] = 'php_string: '.$data[$i];               
+            }
         }        
         file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
     }
