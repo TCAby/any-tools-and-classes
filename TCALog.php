@@ -7,12 +7,12 @@
 */
 class TCALog
 {
-    private function get_logfilename() {
+    private static function get_logfilename() {
         // внутренняя функция для генерации имени log-файла, с использованием текущей даты
         return ('tcalog_'.date("dmY").'.txt');
     }
     
-    private function get_backtrace() {
+    private static function get_backtrace() {
         // возвращается отформатированный результат функции debug_backtrace
         $arr_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $backdata = $arr_backtrace[1];
