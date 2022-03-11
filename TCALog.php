@@ -21,16 +21,19 @@ class TCALog
         return $out;
     }
     
-    public static function send2console($data){ 
+    public static function send2console(...$data){ 
         /*
          * Функция вывода информации в консоль браузера
+         * (upd 11.03.2022): Функция принимает переменный список аргументов
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
          */
-        if(is_array($data) || is_object($data)){
-            echo("<script>console.log('".self::get_backtrace()."php_array: ".json_encode($data)."');</script>");
-        } else {
-            echo("<script>console.log('".self::get_backtrace()."php_string: ".$data."');</script>");
-        }
+		for ($i=0; $i<count($data); $i++) {
+			if(is_array($data[$i]) || is_object($data[$i])){
+				echo("<script>console.log('".self::get_backtrace()."php_array: ".json_encode($data[$i])."');</script>");
+			} else {
+				echo("<script>console.log('".self::get_backtrace()."php_string: ".$data[$i]."');</script>");
+			}
+		}
     }
     
     public static function send_get_defined_vars2console() {
@@ -52,7 +55,7 @@ class TCALog
     public static function send2file(...$data) {
         /*
          * Функция вывода информации в файл tcalog_<cuttent_date>.txt (например, tcalog_04102021.txt)
-         * Функция принимает переменный список аргументов (upd 04.10.2021)
+         * (upd 04.10.2021): Функция принимает переменный список аргументов
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
          */
         date_default_timezone_set('Europe/Minsk');
