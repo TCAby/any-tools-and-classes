@@ -20,13 +20,19 @@ class TCAStatuses
         return ($status[$code])?$status[$code]:$status[500];
     }
 
-    public static function responseJson($additional_text_status = '', $status = 500) {
+    public static function responseJson($additional_text_status = '', $status = 500, $json=[], $is_encode = true) {
         $data = [
             'response' => TCAStatuses::requestStatus($status),
             'code' => $status,
-            'comments' => $additional_text_status
+            'comments' => $additional_text_status,
+            'json' => $json
         ];
-        return json_encode($data);
+
+        if ($is_encode) {
+            return json_encode($data);
+        } else {
+            return $data;
+        }
     }
 
 
