@@ -1,6 +1,6 @@
 <?php
 
-/* (c) Trakhtenberg Consulting Agency, 2021
+/* (c) Trakhtenberg Consulting Agency, 2021-2022
     Вывод отладочной информации
         1) в консоль разработчика в браузере (*2console)
         2) в локальный файл на сервере (*2file)
@@ -26,13 +26,31 @@ class TCALog
          * Функция вывода информации в консоль браузера
          * (upd 11.03.2022): Функция принимает переменный список аргументов
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
+         * (upd 19.05.2022): Более тщательная отработка типов данных + мелкие исправления
          */
-		for ($i=0; $i<count($data); $i++) {
-			if(is_array($data[$i]) || is_object($data[$i])){
-				echo("<script>console.log('".self::get_backtrace()."php_array: ".json_encode($data[$i])."');</script>");
-			} else {
-				echo("<script>console.log('".self::get_backtrace()."php_string: ".$data[$i]."');</script>");
-			}
+        $count_data = count($data);
+		for ( $i=0; $i < $count_data; $i++ ) {
+            $var_type = gettype($data[$i]);
+            switch ($var_type) {
+                case 'array':
+                    $log_output[] = 'php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    break;
+                case 'object':
+                    $log_output[] = 'php_class: ' . get_class( $data[$i] ) . ', php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    break;
+                case 'string':
+                case 'integer':
+                case 'float':
+                case 'double':
+                    $log_output[] = 'php_' . $var_type . ': ' . $data[$i];
+                    break;
+                case 'boolean':
+                    $log_output[] = 'php_' . $var_type . ': ' . ($data[$i]?'true':'false');
+                    break;
+                case 'NULL':
+                    $log_output[] = 'php_' . $var_type;
+                    break;
+            }
 		}
     }
     
@@ -57,17 +75,35 @@ class TCALog
          * Функция вывода информации в файл tcalog_<cuttent_date>.txt (например, tcalog_04102021.txt)
          * (upd 04.10.2021): Функция принимает переменный список аргументов
          * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
+         * (upd 19.05.2022): Более тщательная отработка типов данных + мелкие исправления
          */
         date_default_timezone_set('Europe/Minsk');
-        
-        for ($i=0; $i<count($data); $i++) {
-            if(is_array($data[$i]) || is_object($data[$i])){
-                $log_output[] = 'php_array: '.json_encode($data[$i]); 
-            } else {
-                $log_output[] = 'php_string: '.$data[$i];               
+
+        $count_data = count($data);
+        for ( $i=0; $i < $count_data; $i++ ) {
+            $var_type = gettype($data[$i]);
+            switch ($var_type) {
+                case 'array':
+                    $log_output[] = 'php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    break;
+                case 'object':
+                    $log_output[] = 'php_class: ' . get_class( $data[$i] ) . ', php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    break;
+                case 'string':
+                case 'integer':
+                case 'float':
+                case 'double':
+                    $log_output[] = 'php_' . $var_type . ': ' . $data[$i];
+                    break;
+                case 'boolean':
+                    $log_output[] = 'php_' . $var_type . ': ' . ($data[$i]?'true':'false');
+                    break;
+                case 'NULL':
+                    $log_output[] = 'php_' . $var_type;
+                    break;
             }
-        }        
-        file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s e'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
+        }
+        file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s e'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 
     public static function send_get_defined_vars2file() {
