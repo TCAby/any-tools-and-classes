@@ -1,42 +1,52 @@
 <?php
 
-/* (c) Trakhtenberg Consulting Agency, 2021-2022
-    Вывод отладочной информации
-        1) в консоль разработчика в браузере (*2console)
-        2) в локальный файл на сервере (*2file)
+/* (c) Trakhtenberg Consulting Agency, TCA.by, 2021-2023
+    Output the debugging information
+        1) into developer's console in your browser (*2console methods)
+        2) to a local file on the server (*2file methods)
 */
 class TCALog
 {
-    private static function get_logfilename() {
-        // внутренняя функция для генерации имени log-файла, с использованием текущей даты
+    /**
+     * @return string
+     */
+    private static function _get_logfilename() {
+        // private internal function to generate a log file name, using the current date
         return ('tcalog_'.date("dmY").'.txt');
     }
-    
-    private static function get_backtrace() {
-        // возвращается отформатированный результат функции debug_backtrace
+
+    /**
+     * @return string
+     */
+    private static function _get_backtrace() {
+        // returns the formatted result of the debug_backtrace function
         $arr_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $backdata = $arr_backtrace[1];
         $out = 'Called from '.$backdata['file'].' at line '.$backdata['line'].' ';
         
         return $out;
     }
-    
-    public static function send2console(...$data){ 
+
+    /**
+     * @param ...$data
+     */
+    public static function send2console(...$data){
         /*
-         * Функция вывода информации в консоль браузера
-         * (upd 11.03.2022): Функция принимает переменный список аргументов
-         * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
-         * (upd 19.05.2022): Более тщательная отработка типов данных + мелкие исправления
+         * Function for outputting information to the browser console
+         *  (upd 04.10.2021): The function accepts a variable list of arguments
+         * Automatically recognizes the received parameter type, and outputs either a string or an array
+         *  (upd 19.05.2022): Better handling of data types + minor fixes
+         *  (upd 20.04.2023): For arrays and classes, use var_export() instead of json_encode
          */
         $count_data = count($data);
 		for ( $i=0; $i < $count_data; $i++ ) {
             $var_type = gettype($data[$i]);
             switch ($var_type) {
                 case 'array':
-                    $log_output[] = 'php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    $log_output[] = 'php_' . $var_type . ': ' . var_export( $data[$i], true );
                     break;
                 case 'object':
-                    $log_output[] = 'php_class: ' . get_class( $data[$i] ) . ', php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    $log_output[] = 'php_class: ' . get_class( $data[$i] ) . ', php_' . $var_type . ': ' . var_export( $data[$i], true );
                     break;
                 case 'string':
                 case 'integer':
@@ -56,26 +66,27 @@ class TCALog
     
     public static function send_get_defined_vars2console() {
         /*
-         * Функция вывода информации в консоль браузера
-         * Выводит все определенные к моменту вызова в данной области видимости переменные
+         * Outputs information to the browser console
+         * Outputs all variables defined at the moment of call in the given scope
          */
-        echo("<script>console.log('".self::get_backtrace()."variables: ".json_encode(get_defined_vars())."');</script>");
+        print_r("<script>console.log('".self::_get_backtrace()."variables: ".json_encode(get_defined_vars())."');</script>");
     }
     
     public static function send_debug_backtrace2console() {
         /*
-         * Функция вывода информации в консоль браузера
-         * Выводит стек вызова функции
+         * Outputs information to the browser console
+         * Outputs the function call stack
          */
-        echo("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
+        print_r("<script>console.log('".self::_get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
     }
 
     public static function send2file(...$data) {
         /*
-         * Функция вывода информации в файл tcalog_<cuttent_date>.txt (например, tcalog_04102021.txt)
-         * (upd 04.10.2021): Функция принимает переменный список аргументов
-         * Автоматически распознает полученный тип параметры, и выводит либо строку, либо массив
-         * (upd 19.05.2022): Более тщательная отработка типов данных + мелкие исправления
+         * Function for outputting information to the file tcalog_<cuttent_date>.txt (for example, tcalog_04102021.txt)
+         *  (upd 04.10.2021): The function accepts a variable list of arguments
+         * Automatically recognizes the received parameter type, and outputs either a string or an array
+         *  (upd 19.05.2022): Better handling of data types + minor fixes
+         *  (upd 20.04.2023): For arrays and classes, use var_export() instead of json_encode
          */
         date_default_timezone_set('Europe/Minsk');
 
@@ -84,10 +95,10 @@ class TCALog
             $var_type = gettype($data[$i]);
             switch ($var_type) {
                 case 'array':
-                    $log_output[] = 'php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    $log_output[] = 'php_' . $var_type . ': ' . var_export( $data[$i], true );
                     break;
                 case 'object':
-                    $log_output[] = 'php_class: ' . get_class( $data[$i] ) . ', php_' . $var_type . ': ' . json_encode( $data[$i] );
+                    $log_output[] = 'php_class: ' . get_class( $data[$i] ) . ', php_' . $var_type . ': ' . var_export( $data[$i], true );
                     break;
                 case 'string':
                 case 'integer':
@@ -103,7 +114,7 @@ class TCALog
                     break;
             }
         }
-        file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s e'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
+        file_put_contents(self::_get_logfilename(), print_r([$log_output, date('H:i:s e'), self::_get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 
     public static function send_get_defined_vars2file() {
@@ -112,7 +123,7 @@ class TCALog
          * Выводит все определенные к моменту вызова в данной области видимости переменные
          */
         date_default_timezone_set('Europe/Minsk');
-        file_put_contents(self::get_logfilename(), print_r([json_encode(get_defined_vars()), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
+        file_put_contents(self::_get_logfilename(), print_r([json_encode(get_defined_vars()), date('H:i:s'), self::_get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
     
     public static function send_debug_backtrace2file() {
@@ -121,6 +132,6 @@ class TCALog
          * Выводит стек вызова функции
          */
         date_default_timezone_set('Europe/Minsk');
-        file_put_contents(self::get_logfilename(), print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);        
+        file_put_contents(self::_get_logfilename(), print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), date('H:i:s'), self::_get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }
