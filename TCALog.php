@@ -10,7 +10,8 @@ class TCALog
     /**
      * @return string
      */
-    private static function _get_logfilename() {
+    private static function get_logfilename()
+    {
         // private internal function to generate a log file name, using the current date
         return ('tcalog_'.date("dmY").'.txt');
     }
@@ -18,7 +19,8 @@ class TCALog
     /**
      * @return string
      */
-    private static function _get_backtrace() {
+    private static function get_backtrace()
+    {
         // returns the formatted result of the debug_backtrace function
         $arr_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $backdata = $arr_backtrace[1];
@@ -26,11 +28,13 @@ class TCALog
         
         return $out;
     }
+    
 
     /**
      * @param ...$data
      */
-    public static function send2console(...$data){
+    public static function send2console(...$data)
+    {
         /*
          * Function for outputting information to the browser console
          *  (upd 04.10.2021): The function accepts a variable list of arguments
@@ -64,23 +68,26 @@ class TCALog
 		}
     }
     
-    public static function send_get_defined_vars2console() {
+    public static function send_get_defined_vars2console()
+    {
         /*
          * Outputs information to the browser console
          * Outputs all variables defined at the moment of call in the given scope
          */
-        print_r("<script>console.log('".self::_get_backtrace()."variables: ".json_encode(get_defined_vars())."');</script>");
+        print_r("<script>console.log('".self::get_backtrace()."variables: ".json_encode(get_defined_vars())."');</script>");
     }
     
-    public static function send_debug_backtrace2console() {
+    public static function send_debug_backtrace2console()
+    {
         /*
          * Outputs information to the browser console
          * Outputs the function call stack
          */
-        print_r("<script>console.log('".self::_get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
+        print_r("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
     }
 
-    public static function send2file(...$data) {
+    public static function send2file(...$data)
+    {
         /*
          * Function for outputting information to the file tcalog_<cuttent_date>.txt (for example, tcalog_04102021.txt)
          *  (upd 04.10.2021): The function accepts a variable list of arguments
@@ -114,24 +121,26 @@ class TCALog
                     break;
             }
         }
-        file_put_contents(self::_get_logfilename(), print_r([$log_output, date('H:i:s e'), self::_get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
+        file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s e'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 
-    public static function send_get_defined_vars2file() {
+    public static function send_get_defined_vars2file()
+    {
         /*
          * Функция вывода информации в файл tcalog.txt
          * Выводит все определенные к моменту вызова в данной области видимости переменные
          */
         date_default_timezone_set('Europe/Minsk');
-        file_put_contents(self::_get_logfilename(), print_r([json_encode(get_defined_vars()), date('H:i:s'), self::_get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
+        file_put_contents(self::get_logfilename(), print_r([json_encode(get_defined_vars()), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
     
-    public static function send_debug_backtrace2file() {
+    public static function send_debug_backtrace2file()
+    {
         /*
          * Функция вывода информации в файл tcalog.txt
          * Выводит стек вызова функции
          */
         date_default_timezone_set('Europe/Minsk');
-        file_put_contents(self::_get_logfilename(), print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), date('H:i:s'), self::_get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
+        file_put_contents(self::get_logfilename(), print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }
