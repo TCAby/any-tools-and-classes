@@ -7,6 +7,8 @@
 */
 class TCALog
 {
+
+
     /**
      * @return string
      */
@@ -28,7 +30,7 @@ class TCALog
         
         return $out;
     }
-    
+
 
     /**
      * @param ...$data
@@ -67,7 +69,10 @@ class TCALog
             }
 		}
     }
-    
+
+    /**
+     *
+     */
     public static function send_get_defined_vars2console()
     {
         /*
@@ -76,16 +81,27 @@ class TCALog
          */
         print_r("<script>console.log('".self::get_backtrace()."variables: ".json_encode(get_defined_vars())."');</script>");
     }
-    
+
+    /**
+     *
+     */
     public static function send_debug_backtrace2console()
     {
         /*
          * Outputs information to the browser console
          * Outputs the function call stack
          */
-        print_r("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
+        print_r(self::prepare_debug_backtrace2console());
     }
 
+    private static function prepare_debug_backtrace2console()
+    {
+        return ("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
+    }
+
+    /**
+     * @param ...$data
+     */
     public static function send2file(...$data)
     {
         /*
@@ -124,6 +140,9 @@ class TCALog
         file_put_contents(self::get_logfilename(), print_r([$log_output, date('H:i:s e'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 
+    /**
+     *
+     */
     public static function send_get_defined_vars2file()
     {
         /*
@@ -133,7 +152,10 @@ class TCALog
         date_default_timezone_set('Europe/Minsk');
         file_put_contents(self::get_logfilename(), print_r([json_encode(get_defined_vars()), date('H:i:s'), self::get_backtrace()], true).PHP_EOL, FILE_APPEND | LOCK_EX);
     }
-    
+
+    /**
+     *
+     */
     public static function send_debug_backtrace2file()
     {
         /*
