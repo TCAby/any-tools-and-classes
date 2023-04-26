@@ -91,13 +91,9 @@ class TCALog
          * Outputs information to the browser console
          * Outputs the function call stack
          */
-        print_r(self::prepare_debug_backtrace2console());
+        print_r("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
     }
 
-    private static function prepare_debug_backtrace2console()
-    {
-        return ("<script>console.log('".self::get_backtrace()."variables: ".json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))."');</script>");
-    }
 
     /**
      * @param ...$data
